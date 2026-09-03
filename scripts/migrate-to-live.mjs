@@ -93,18 +93,20 @@ if (!SKIP_IMAGES && (!cloud.name || !cloud.key || !cloud.secret)) {
 async function cloudinaryUpload(absPath, publicId) {
   const buf = await readFile(absPath);
   const ts = Math.floor(Date.now() / 1000);
-  const toSign = `overwrite=true&public_id=${publicId}&timestamp=${ts}`;
-  const signature = createHash("sha1").update(toSign + cloud.secret).digest("hex");
+  // Sign only the params we send, in alphabetical order, then append the secret.
+  const toSign = `public_id=${publicId}&timestamp=${ts}`;
+  const signature = createHash("sha1")
+    .update(toSign + cloud.secret.trim())
+    .digest("hex");
 
   const form = new FormData();
   form.append("file", new Blob([buf]));
-  form.append("api_key", cloud.key);
+  form.append("api_key", cloud.key.trim());
   form.append("timestamp", String(ts));
   form.append("public_id", publicId);
-  form.append("overwrite", "true");
   form.append("signature", signature);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud.name}/image/upload`, {
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud.name.trim()}/image/upload`, {
     method: "POST",
     body: form,
   });
