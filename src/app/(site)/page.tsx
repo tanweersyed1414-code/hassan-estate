@@ -93,6 +93,10 @@ export default async function HomePage() {
     "Speak with our team for a free, no-obligation consultation on buying, selling, or building in Top City-1.";
   const ctaImage = settings.cta_image || "/homepage/consultant.jpg";
 
+  const heroPillImage = settings.hero_pill_image || "/homepage/consultant.jpg";
+  const heroPillTitle = settings.hero_pill_title || "Verified listings, honest pricing";
+  const heroPillSubtitle = settings.hero_pill_subtitle || "Trusted by 500+ clients across Top City-1";
+
   const collageImages = [
     { src: settings.homepage_collage_1 || "/homepage/about-1.jpg", alt: "Top City-1 residence" },
     { src: settings.homepage_collage_2 || "/homepage/about-3.jpg", alt: "Modern home built by Sandhu Builders" },
@@ -166,11 +170,11 @@ export default async function HomePage() {
 
                 <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3 rounded-2xl bg-white/95 p-3 shadow-warm sm:right-auto sm:max-w-xs">
                   <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                    <Image src="/homepage/consultant.jpg" alt="" fill className="object-cover" aria-hidden />
+                    <Image src={heroPillImage} alt="" fill sizes="48px" className="object-cover" aria-hidden />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-navy-950">Verified listings, honest pricing</p>
-                    <p className="text-[11px] text-gray-500">Trusted by 500+ clients across Top City-1</p>
+                    <p className="text-xs font-semibold text-navy-950">{heroPillTitle}</p>
+                    <p className="text-[11px] text-gray-500">{heroPillSubtitle}</p>
                   </div>
                 </div>
               </Reveal>

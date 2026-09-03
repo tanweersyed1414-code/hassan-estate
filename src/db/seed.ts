@@ -441,6 +441,10 @@ async function main() {
       { key: "cta_text", value: "Speak with our team for a free, no-obligation consultation on buying, selling, or building in Top City-1." },
       { key: "cta_image", value: "/homepage/consultant.jpg" },
 
+      { key: "hero_pill_image", value: "/homepage/consultant.jpg" },
+      { key: "hero_pill_title", value: "Verified listings, honest pricing" },
+      { key: "hero_pill_subtitle", value: "Trusted by 500+ clients across Top City-1" },
+
       { key: "about_image", value: "/homepage/about-3.jpg" },
       { key: "homepage_collage_1", value: "/homepage/about-1.jpg" },
       { key: "homepage_collage_2", value: "/homepage/about-3.jpg" },

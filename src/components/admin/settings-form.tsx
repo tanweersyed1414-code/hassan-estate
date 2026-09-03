@@ -198,6 +198,27 @@ export function SettingsForm({ initial }: { initial: Record<string, string> }) {
         <SingleImageField label="Image" value={values.cta_image || ""} onChange={(url) => set("cta_image", url)} />
       </Section>
 
+      {/* Homepage hero trust pill */}
+      <Section
+        title="Homepage Hero Badge"
+        desc="The small white card that floats over the hero photo — the round profile photo and its two lines of text."
+      >
+        <SingleImageField
+          label="Profile Photo"
+          hint="A head-and-shoulders photo. A background-removed PNG looks cleanest inside the circle."
+          value={values.hero_pill_image || ""}
+          onChange={(url) => set("hero_pill_image", url)}
+        />
+        <div>
+          <Label>Top line</Label>
+          <Input value={values.hero_pill_title || ""} onChange={(e) => set("hero_pill_title", e.target.value)} />
+        </div>
+        <div>
+          <Label>Bottom line</Label>
+          <Input value={values.hero_pill_subtitle || ""} onChange={(e) => set("hero_pill_subtitle", e.target.value)} />
+        </div>
+      </Section>
+
       {/* Builders page hero */}
       <Section title="Builders Page Hero" desc="The banner at the top of the Builders & Services page.">
         <div>
