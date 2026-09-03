@@ -1,0 +1,338 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #14161a;
+
+  /* Brand palette: near-black ink + vivid sunset orange. "navy-*"/"gold-*"
+     names are kept for backward compatibility with the admin-configurable
+     theme system (src/lib/theme.ts derives these same six/five-step scales
+     from two admin-picked base colors) — only the default hex values changed. */
+  --navy-950: #14161a;
+  --navy-900: #21252d;
+  --navy-800: #2d323c;
+  --navy-700: #3d434f;
+  --navy-600: #4f5764;
+  --navy-500: #656f7e;
+
+  --gold-600: #d97e0e;
+  --gold-500: #f5a524;
+  --gold-400: #f8b850;
+  --gold-300: #fbd08a;
+  --gold-50: #fff6e8;
+
+  --charcoal: #14161a;
+  --gray-50: #f7f8fa;
+  --gray-100: #eef0f3;
+  --gray-200: #e2e5ea;
+  --gray-400: #98a0ac;
+  --gray-600: #5c6472;
+
+  /* Font stacks live here (not only in @theme inline) so they're emitted as
+     real CSS variables: `body` and `.font-serif-brand` consume them via
+     var(), and the admin Typography panel overrides them per site (see
+     src/lib/typography.ts). --font-inter / --font-jakarta and the other
+     --font-* families come from next/font in the root layout. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius: 1.25rem;
+
+  /* shadcn-standard semantic tokens, mapped onto the brand palette above so
+     drop-in shadcn/ui-style components (which expect --card, --primary,
+     etc.) work without modification. --primary is an unwrapped HSL triplet
+     (shadcn convention) for use as hsl(var(--primary)). */
+  --card: #ffffff;
+  --card-foreground: var(--navy-950);
+  --muted-foreground: var(--gray-600);
+  --primary: 38 90% 55%;
+  --primary-foreground: var(--navy-950);
+}
+
+/* Dark theme — swaps the page-level background/foreground only.
+   Brand tokens (navy-*, gold-*) stay fixed; components that need a
+   dark-aware surface use explicit dark: utility variants (e.g.
+   dark:bg-navy-900) rather than a redefined navy scale. */
+.dark {
+  --background: #16181c;
+  --foreground: #f0f1f3;
+
+  --card: var(--navy-900);
+  --card-foreground: #f5f6f7;
+  --muted-foreground: rgba(245, 246, 247, 0.6);
+  --primary: 38 90% 60%;
+  --primary-foreground: var(--navy-950);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-navy-500: var(--navy-500);
+
+  --color-gold-600: var(--gold-600);
+  --color-gold-500: var(--gold-500);
+  --color-gold-400: var(--gold-400);
+  --color-gold-300: var(--gold-300);
+  --color-gold-50: var(--gold-50);
+
+  --color-charcoal: var(--charcoal);
+  --color-gray-50: var(--gray-50);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-400: var(--gray-400);
+  --color-gray-600: var(--gray-600);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: var(--primary-foreground);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 0.4rem);
+  --radius-sm: calc(var(--radius) - 0.7rem);
+}
+
+* {
+  border-color: var(--gray-200);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Bold display face used for headings — a punchy grotesk, not a serif. The
+   class name is kept from an earlier pass; only the font it points to changed. */
+.font-serif-brand {
+  font-family: var(--font-serif), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Respect reduced motion preference across the site */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Frosted surface for the nav once it leaves the hero photo, and for
+   floating chips over imagery. */
+.glass {
+  background: rgba(20, 22, 26, 0.55);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+}
+
+/* Small uppercase label with a leading rule, used to introduce sections. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-600);
+}
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.section-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .section-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--gray-50); }
+::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-500); }
+
+/* Custom range slider (installment calculator) */
+input[type="range"].brand-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-500), var(--gold-500));
+  background-color: var(--gray-200);
+}
+input[type="range"].brand-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--navy-900);
+  border: 3px solid var(--gold-500);
+  cursor: pointer;
+}
+input[type="range"].brand-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--navy-900);
+  border: 3px solid var(--gold-500);
+  cursor: pointer;
+}
+
+/* Soft, warm shadow used on cards/buttons instead of flat black shadows —
+   reads as "lifted" rather than "boxed". */
+.shadow-warm {
+  box-shadow: 0 20px 45px -20px rgba(20, 22, 26, 0.22);
+}
+.shadow-warm-sm {
+  box-shadow: 0 10px 25px -12px rgba(20, 22, 26, 0.18);
+}
+
+/* ============================================================
+   Admin panel elevation system
+   Light mode keeps the familiar soft-bordered card. Dark mode
+   drops the glowing hairline outline in favour of layered black
+   shadows, a recessed containment ring, and a bright top inset —
+   so a card reads as a real surface lifted off the page, with a
+   clear contrast step from the background.
+   ============================================================ */
+:root {
+  --admin-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Page shell — flat in light, faint top glow for depth in dark. */
+.admin-shell {
+  background-color: var(--gray-50);
+}
+.dark .admin-shell {
+  background-color: var(--background);
+  background-image: radial-gradient(1100px 600px at 50% -340px, rgba(255, 255, 255, 0.05), transparent 70%);
+}
+
+.admin-card {
+  background-color: #ffffff;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 12px 30px -16px rgba(20, 22, 26, 0.12);
+  transition: transform 0.24s var(--admin-ease), box-shadow 0.24s var(--admin-ease),
+    border-color 0.24s var(--admin-ease), background-color 0.24s var(--admin-ease);
+}
+.dark .admin-card {
+  background-color: var(--navy-900);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.045));
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.32),
+    0 10px 22px -6px rgba(0, 0, 0, 0.48),
+    0 24px 50px -18px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Interactive cards (dashboard tiles / quick links) lift on hover. */
+.admin-card-interactive {
+  cursor: pointer;
+}
+.admin-card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(20, 22, 26, 0.08), 0 24px 46px -18px rgba(20, 22, 26, 0.2);
+}
+.dark .admin-card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    0 16px 32px -8px rgba(0, 0, 0, 0.5),
+    0 40px 72px -24px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+.admin-card-interactive:active {
+  transform: translateY(-1px);
+  transition-duration: 0.1s;
+}
+
+/* Nested panel inside an .admin-card — a readable fill + edge, no shadow. */
+.admin-subcard {
+  border: 1px solid var(--gray-100);
+  transition: border-color 0.24s var(--admin-ease), background-color 0.24s var(--admin-ease);
+}
+.dark .admin-subcard {
+  border-color: rgba(255, 255, 255, 0.07);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Structural rails — border divider in light, soft shadow edge in dark. */
+.dark .admin-rail-r {
+  border-color: transparent;
+  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.5), 10px 0 30px -12px rgba(0, 0, 0, 0.55);
+}
+.dark .admin-rail-b {
+  border-color: transparent;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 12px 30px -14px rgba(0, 0, 0, 0.55);
+  position: relative;
+  z-index: 20;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-card,
+  .admin-card-interactive,
+  .admin-subcard {
+    transition: none;
+  }
+  .admin-card-interactive:hover,
+  .admin-card-interactive:active {
+    transform: none;
+  }
+}
+
+/* Gentle vertical float, used on layered hero elements and the 3D canvas
+   wrapper for a subtle sense of depth without being distracting. */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-14px); }
+}
+.float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+.float-y-slow {
+  animation: float-y 9s ease-in-out infinite;
+}
