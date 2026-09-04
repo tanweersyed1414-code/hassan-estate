@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { chatMessageSchema } from "@/lib/validations";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { buildChatContext, contextToPromptText, FALLBACK_MESSAGE, quickActionsForIntent, ruleBasedReply } from "@/lib/ai";
+import { getSiteSettingsMap } from "@/lib/queries";
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
@@ -31,7 +32,11 @@ export async function POST(req: Request) {
     const { default: OpenAI } = await import("openai");
     const client = new OpenAI({ apiKey });
 
-    const systemPrompt = `You are "Hassan AI Assistant", the official assistant for Hassan Estates with Sandhu Builders, a real estate and construction company based in Top City-1, B Block Commercial, Islamabad, Pakistan (phone/WhatsApp: 0331 8987584).
+    const settings = await getSiteSettingsMap();
+    const officeAddress = settings.contact_address || "Top City-1, B Block Commercial, Islamabad, Pakistan";
+    const officePhone = process.env.NEXT_PUBLIC_PHONE_NUMBER || "0331 8987584";
+
+    const systemPrompt = `You are "Hassan AI Assistant", the official assistant for Hassan Estates with Sandhu Builders, a real estate and construction company based at ${officeAddress} (phone/WhatsApp: ${officePhone}).
 
 You represent ONLY Hassan Estates with Sandhu Builders. You are not a general real-estate assistant, and you do not have — and must never use — any outside or pretrained knowledge about the real estate market, other developers, other builders/agencies, property prices elsewhere, or general buying/investment advice not sourced from the verified context below.
 

@@ -25,13 +25,14 @@ const columns = [
 
 interface FooterProps {
   logoUrl?: string;
+  address?: string;
   facebookUrl?: string;
   instagramUrl?: string;
   youtubeUrl?: string;
   customSocialLinks?: CustomSocialLink[];
 }
 
-export function Footer({ logoUrl, facebookUrl, instagramUrl, youtubeUrl, customSocialLinks }: FooterProps) {
+export function Footer({ logoUrl, address, facebookUrl, instagramUrl, youtubeUrl, customSocialLinks }: FooterProps) {
   const socialLinks = [
     { url: facebookUrl, label: "Facebook", Icon: FacebookIcon },
     { url: instagramUrl, label: "Instagram", Icon: InstagramIcon },
@@ -102,7 +103,7 @@ export function Footer({ logoUrl, facebookUrl, instagramUrl, youtubeUrl, customS
           <ul className="mt-5 space-y-3 text-sm">
             <li className="flex gap-2.5">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold-400" />
-              <span>Top City-1, B Block Commercial, Islamabad, Pakistan</span>
+              <span>{address || "Top City-1, B Block Commercial, Islamabad, Pakistan"}</span>
             </li>
             <li className="flex gap-2.5">
               <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold-400" />

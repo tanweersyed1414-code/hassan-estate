@@ -9,29 +9,32 @@ import { buildTypographyCss } from "@/lib/typography";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-const localBusinessJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "RealEstateAgent",
-  name: "Hassan Estates with Sandhu Builders",
-  image: `${siteUrl}/opengraph-image`,
-  url: siteUrl,
-  telephone: "+92-331-8987584",
-  priceRange: "PKR",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Top City-1, B Block Commercial",
-    addressLocality: "Islamabad",
-    addressCountry: "PK",
-  },
-  areaServed: ["Top City-1 Islamabad", "Islamabad", "Rawalpindi"],
-  openingHours: "Mo-Sa 10:00-20:00",
-};
-
 export const revalidate = 60;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettingsMap();
   const logoUrl = settings.site_logo_url || undefined;
+  const contactAddress = settings.contact_address || "Top City-1, B Block Commercial, Islamabad, Pakistan";
+  const contactEmail = settings.contact_email || undefined;
+
+  const localBusinessJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    name: "Hassan Estates with Sandhu Builders",
+    image: `${siteUrl}/opengraph-image`,
+    url: siteUrl,
+    telephone: process.env.NEXT_PUBLIC_PHONE_NUMBER || "+92-331-8987584",
+    ...(contactEmail ? { email: contactEmail } : {}),
+    priceRange: "PKR",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: contactAddress,
+      addressLocality: "Islamabad",
+      addressCountry: "PK",
+    },
+    areaServed: ["Top City-1 Islamabad", "Islamabad", "Rawalpindi"],
+    openingHours: "Mo-Sa 10:00-20:00",
+  };
 
   // Admin-configurable fonts / text size / text colours (Settings → Typography).
   // Scoped to the public site — the admin panel keeps its own default styling.
@@ -55,6 +58,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main className="min-h-screen">{children}</main>
       <Footer
         logoUrl={logoUrl}
+        address={contactAddress}
         facebookUrl={settings.facebook_url}
         instagramUrl={settings.instagram_url}
         youtubeUrl={settings.youtube_url}

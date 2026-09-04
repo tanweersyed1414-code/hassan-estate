@@ -292,6 +292,44 @@ export function SettingsForm({ initial }: { initial: Record<string, string> }) {
         </div>
       </Section>
 
+      {/* Contact details (Contact page + footer + map) */}
+      <Section
+        title="Contact Information"
+        desc="The address, email, and map shown on the Contact page and in the site footer."
+      >
+        <div>
+          <Label>Office Address</Label>
+          <Textarea
+            rows={2}
+            value={values.contact_address || ""}
+            onChange={(e) => set("contact_address", e.target.value)}
+            placeholder="1st Floor, Hassan Estates Office, Topcity 1 / B block commercial Market, Islamabad, 44000"
+          />
+        </div>
+        <div>
+          <Label>Contact Email</Label>
+          <Input
+            type="email"
+            value={values.contact_email || ""}
+            onChange={(e) => set("contact_email", e.target.value)}
+            placeholder="info@example.com"
+          />
+        </div>
+        <div>
+          <Label>Map Location</Label>
+          <p className="mb-1 text-xs text-gray-400 dark:text-white/40">
+            An address, or exact <span className="font-mono">latitude,longitude</span> (right-click your pin in Google
+            Maps → click the coordinates to copy). You can also paste a full Google Maps embed URL. Leave blank to use
+            the office address above.
+          </p>
+          <Input
+            value={values.contact_map_query || ""}
+            onChange={(e) => set("contact_map_query", e.target.value)}
+            placeholder="33.6392, 72.8397"
+          />
+        </div>
+      </Section>
+
       {/* Hours & core social links */}
       <Section title="Office Hours & Social Links" desc="Your primary contact hours and the three main social platforms.">
         <div className="grid gap-4 sm:grid-cols-2">

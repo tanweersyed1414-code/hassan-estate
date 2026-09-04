@@ -13,9 +13,12 @@ export const metadata: Metadata = {
 
 export default async function ContactPage() {
   const settings = await getSiteSettingsMap();
-  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(
-    "Top City-1, B Block Commercial, Islamabad, Pakistan"
-  )}&output=embed`;
+  const address = settings.contact_address || "Top City-1, B Block Commercial, Islamabad, Pakistan";
+  const email = settings.contact_email || "info@hassanestates.pk";
+  const mapLocation = settings.contact_map_query || address;
+  const mapSrc = /^https?:\/\//.test(mapLocation)
+    ? mapLocation
+    : `https://www.google.com/maps?q=${encodeURIComponent(mapLocation)}&output=embed`;
   const bannerImage = settings.contact_hero_image || "/demo/office-1.jpg";
 
   return (
@@ -36,7 +39,7 @@ export default async function ContactPage() {
             <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-white/60">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-gold-600 dark:text-gold-400" />
-                <span>Top City-1, B Block Commercial, Islamabad, Pakistan</span>
+                <span>{address}</span>
               </li>
               <li className="flex gap-3">
                 <Phone className="mt-0.5 h-5 w-5 shrink-0 text-gold-600 dark:text-gold-400" />
@@ -46,7 +49,9 @@ export default async function ContactPage() {
               </li>
               <li className="flex gap-3">
                 <Mail className="mt-0.5 h-5 w-5 shrink-0 text-gold-600 dark:text-gold-400" />
-                <span>info@hassanestates.pk</span>
+                <a href={`mailto:${email}`} className="hover:text-navy-900 dark:hover:text-white">
+                  {email}
+                </a>
               </li>
               <li className="flex gap-3">
                 <Clock className="mt-0.5 h-5 w-5 shrink-0 text-gold-600 dark:text-gold-400" />

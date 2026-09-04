@@ -360,7 +360,7 @@ async function main() {
       category: "COMPANY" as const,
       question: "Where is Hassan Estates with Sandhu Builders located?",
       answer:
-        "Our office is located at Top City-1, B Block Commercial, Islamabad, Pakistan. You can call or WhatsApp us at 0331 8987584.",
+        "Our office is at 1st Floor, Hassan Estates Office, Topcity 1 / B block commercial Market, Islamabad, 44000. You can call or WhatsApp us at 0331 8987584.",
       keywords: "location,address,office,where,find you",
     },
     {
@@ -414,6 +414,9 @@ async function main() {
       { key: "stat_years_experience", value: "12" },
       { key: "stat_years_experience_label", value: "Years of Experience" },
       { key: "office_hours", value: "Mon - Sat: 10:00 AM - 8:00 PM" },
+      { key: "contact_address", value: "Top City-1, B Block Commercial, Islamabad, Pakistan" },
+      { key: "contact_email", value: "info@hassanestates.pk" },
+      { key: "contact_map_query", value: "" },
       { key: "facebook_url", value: "" },
       { key: "instagram_url", value: "" },
       { key: "youtube_url", value: "" },
