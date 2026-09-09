@@ -16,7 +16,9 @@ export const proxy = auth((req) => {
   // ---- Admin route protection ----
   if (pathname.startsWith("/admin") && !PUBLIC_ADMIN_PATHS.includes(pathname)) {
     const session = req.auth;
-    if (!session?.user) {
+    // Only staff accounts (email/password) may enter /admin — never public
+    // Google visitors, even though they hold a valid session.
+    if (!session?.user || session.user.kind !== "admin") {
       const loginUrl = new URL("/admin/login", req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);

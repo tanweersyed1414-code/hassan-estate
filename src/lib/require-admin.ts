@@ -11,11 +11,11 @@ export type Role = "SUPER_ADMIN" | "ADMIN" | "EDITOR";
 export async function requireAdmin(roles?: Role[]) {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user || session.user.kind !== "admin") {
     return { ok: false as const, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
 
-  if (roles && !roles.includes(session.user.role)) {
+  if (roles && (!session.user.role || !roles.includes(session.user.role))) {
     return { ok: false as const, response: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   }
 

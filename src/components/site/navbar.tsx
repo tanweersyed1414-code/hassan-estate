@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { cn, telLink, whatsappLink } from "@/lib/utils";
 import { useChat } from "./chat-context";
 import { ThemeToggle } from "./theme-toggle";
+import { AccountMenu, type AccountVisitor } from "./account-menu";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -23,7 +24,15 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact Us" },
 ];
 
-export function Navbar({ logoUrl }: { logoUrl?: string }) {
+export function Navbar({
+  logoUrl,
+  visitor,
+  showAccount = true,
+}: {
+  logoUrl?: string;
+  visitor?: AccountVisitor | null;
+  showAccount?: boolean;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const chat = useChat();
@@ -123,6 +132,8 @@ export function Navbar({ logoUrl }: { logoUrl?: string }) {
             <span className="h-1.5 w-1.5 rounded-full bg-navy-950" /> Ask Hassan AI
           </Button>
 
+          {showAccount && <AccountMenu visitor={visitor ?? null} variant="bar" />}
+
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <button
@@ -153,6 +164,9 @@ export function Navbar({ logoUrl }: { logoUrl?: string }) {
                 ))}
               </nav>
               <div className="flex flex-col gap-2 border-t border-gray-100 pt-4 dark:border-white/[0.06]">
+                {showAccount && (
+                  <AccountMenu visitor={visitor ?? null} variant="sheet" onNavigate={() => setMobileOpen(false)} />
+                )}
                 <Button variant="outline" onClick={() => window.open(telLink())}>
                   <Phone className="h-4 w-4" /> Call Us
                 </Button>

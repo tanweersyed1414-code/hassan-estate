@@ -6,14 +6,24 @@ import { ChatProvider } from "@/components/site/chat-context";
 import { getSiteSettingsMap } from "@/lib/queries";
 import { parseCustomSocialLinks } from "@/lib/utils";
 import { buildTypographyCss } from "@/lib/typography";
+import { auth } from "@/auth";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const revalidate = 60;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getSiteSettingsMap();
+  const [settings, session] = await Promise.all([getSiteSettingsMap(), auth()]);
   const logoUrl = settings.site_logo_url || undefined;
+  const googleAuthEnabled = Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET);
+  const visitor =
+    session?.user?.kind === "visitor"
+      ? {
+          name: session.user.name || "",
+          email: session.user.email || "",
+          image: session.user.image || "",
+        }
+      : null;
   const contactAddress = settings.contact_address || "Top City-1, B Block Commercial, Islamabad, Pakistan";
   const contactEmail = settings.contact_email || undefined;
 
@@ -54,7 +64,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <ChatProvider>
       {typographyCss && <style dangerouslySetInnerHTML={{ __html: typographyCss }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />
-      <Navbar logoUrl={logoUrl} />
+      <Navbar logoUrl={logoUrl} visitor={visitor} showAccount={googleAuthEnabled || Boolean(visitor)} />
       <main className="min-h-screen">{children}</main>
       <Footer
         logoUrl={logoUrl}

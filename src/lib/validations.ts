@@ -109,14 +109,14 @@ export type InquiryInput = z.infer<typeof inquirySchema>;
 
 export const visitStatuses = ["NEW", "CONFIRMED", "COMPLETED", "CANCELLED"] as const;
 
+// Public booking body — the visitor is identified by their signed-in Google
+// account, so name/email are taken server-side, not from the form.
 export const visitSchema = z.object({
-  name: z.string().min(2, "Please enter your name").max(191),
   phone: z
     .string()
     .min(7, "Please enter a valid phone number")
     .max(40)
     .regex(/^[0-9+\-\s()]+$/, "Please enter a valid phone number"),
-  email: z.string().email().max(191).optional().or(z.literal("")),
   propertyId: z.coerce.number().int().optional().nullable(),
   preferredDate: z.string().min(1, "Please select a preferred date"),
   preferredTime: z.string().max(40).default(""),
@@ -124,6 +124,12 @@ export const visitSchema = z.object({
 });
 
 export type VisitInput = z.infer<typeof visitSchema>;
+
+// Admin decision on a visit request (status + an optional note to the visitor).
+export const visitDecisionSchema = z.object({
+  status: z.enum(visitStatuses).optional(),
+  adminNote: z.string().max(1000).optional(),
+});
 
 export const knowledgeCategories = ["COMPANY", "PROPERTIES", "CONSTRUCTION", "PAYMENT", "FAQ", "POLICIES"] as const;
 

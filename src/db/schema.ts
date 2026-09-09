@@ -252,17 +252,32 @@ export const inquiries = pgTable("inquiries", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- VISITORS (public users who sign in with Google to book visits) ----------
+export const visitors = pgTable("visitors", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 191 }).notNull().unique(),
+  name: varchar("name", { length: 191 }).notNull().default(""),
+  image: text("image").notNull().default(""),
+  googleSub: varchar("google_sub", { length: 255 }).notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  lastLoginAt: timestamp("last_login_at"),
+});
+
 // ---------- PROPERTY VISITS ----------
 export const propertyVisits = pgTable("property_visits", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 191 }).notNull(),
   phone: varchar("phone", { length: 40 }).notNull(),
   email: varchar("email", { length: 191 }).notNull().default(""),
+  visitorId: integer("visitor_id").references(() => visitors.id, { onDelete: "set null" }),
   propertyId: integer("property_id").references(() => properties.id, { onDelete: "set null" }),
   preferredDate: timestamp("preferred_date"),
   preferredTime: varchar("preferred_time", { length: 40 }).notNull().default(""),
   message: text("message").notNull().default(""),
   status: visitStatusEnum("status").notNull().default("NEW"),
+  adminNote: text("admin_note").notNull().default(""),
+  decidedAt: timestamp("decided_at"),
+  notifiedAt: timestamp("notified_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -348,6 +363,7 @@ export type ProjectImage = typeof projectImages.$inferSelect;
 export type ProjectFeature = typeof projectFeatures.$inferSelect;
 export type Inquiry = typeof inquiries.$inferSelect;
 export type PropertyVisit = typeof propertyVisits.$inferSelect;
+export type Visitor = typeof visitors.$inferSelect;
 export type AIKnowledgeEntry = typeof aiKnowledgeBase.$inferSelect;
 export type SiteSetting = typeof siteSettings.$inferSelect;
 export type MediaFile = typeof mediaFiles.$inferSelect;

@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { visitSchema } from "@/lib/validations";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { requireAdmin } from "@/lib/require-admin";
+import { requireVisitor } from "@/lib/visitor";
 import { desc, eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
-  const ip = getClientIp(req);
-  const rl = checkRateLimit(`visit:${ip}`, { limit: 8, windowMs: 10 * 60 * 1000 });
+  // Booking a visit requires a signed-in Google visitor.
+  const gate = await requireVisitor();
+  if (!gate.ok) return gate.response;
+  const { visitor } = gate;
+
+  const rl = checkRateLimit(`visit:${visitor.id}`, { limit: 6, windowMs: 10 * 60 * 1000 });
   if (!rl.success) {
     return NextResponse.json({ error: "Too many requests. Please try again shortly." }, { status: 429 });
   }
@@ -22,9 +27,10 @@ export async function POST(req: Request) {
   const [created] = await db
     .insert(schema.propertyVisits)
     .values({
-      name: data.name,
+      name: visitor.name || "Google user",
+      email: visitor.email,
+      visitorId: visitor.id,
       phone: data.phone,
-      email: data.email || "",
       propertyId: data.propertyId || null,
       preferredDate: data.preferredDate ? new Date(data.preferredDate) : null,
       preferredTime: data.preferredTime,

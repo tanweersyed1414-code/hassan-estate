@@ -11,6 +11,7 @@ import { VisitForm } from "@/components/site/visit-form";
 import { PropertyCard } from "@/components/site/property-card";
 import { Reveal } from "@/components/site/reveal";
 import { getPropertyBySlug, getRelatedProperties } from "@/lib/queries";
+import { auth } from "@/auth";
 import {
   AREA_UNIT_LABELS,
   formatPKR,
@@ -43,6 +44,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   if (!property) notFound();
 
   const related = await getRelatedProperties(property);
+  const session = await auth();
+  const visitorName = session?.user?.kind === "visitor" ? session.user.name || "" : undefined;
   const images = property.images.map((i) => i.url).filter(Boolean);
   if (images.length === 0 && property.featuredImage) images.push(property.featuredImage);
 
@@ -181,7 +184,11 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <h3 className="font-serif-brand text-lg font-medium text-navy-950 dark:text-white">Book a Property Visit</h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-white/50">Our team will confirm your requested time.</p>
             <div className="mt-4">
-              <VisitForm propertyId={property.id} />
+              <VisitForm
+                propertyId={property.id}
+                visitorName={visitorName}
+                bookingEnabled={Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET)}
+              />
             </div>
           </div>
 
