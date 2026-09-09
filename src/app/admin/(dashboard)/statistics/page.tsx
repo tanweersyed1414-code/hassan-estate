@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { Eye, Users, MousePointerClick, ExternalLink } from "lucide-react";
 import { prettyPath } from "@/lib/analytics";
+import { StatisticsReset } from "@/components/admin/statistics-reset";
 
 export const dynamic = "force-dynamic";
 
@@ -236,6 +237,10 @@ export default async function AdminStatisticsPage() {
           </div>
         </div>
       )}
+
+      <div className="mt-8">
+        <StatisticsReset />
+      </div>
     </div>
   );
 }
