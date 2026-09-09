@@ -278,6 +278,8 @@ export const propertyVisits = pgTable("property_visits", {
   adminNote: text("admin_note").notNull().default(""),
   decidedAt: timestamp("decided_at"),
   notifiedAt: timestamp("notified_at"),
+  /** When the visitor last opened /my-visits after a decision — drives the unread dot. */
+  visitorSeenAt: timestamp("visitor_seen_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

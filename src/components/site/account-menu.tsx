@@ -20,16 +20,29 @@ function initials(name: string, email: string) {
   return ((parts[0]?.[0] || src[0] || "?") + (parts[1]?.[0] || "")).toUpperCase();
 }
 
+function UnreadDot({ count, className = "" }: { count: number; className?: string }) {
+  return (
+    <span
+      aria-label={`${count} unread update${count === 1 ? "" : "s"}`}
+      className={`inline-block h-2 w-2 rounded-full bg-red-500 ${className}`}
+    />
+  );
+}
+
 export function AccountMenu({
   visitor,
   variant = "bar",
+  unreadCount = 0,
   onNavigate,
 }: {
   visitor: AccountVisitor | null;
   /** "bar" = compact button in the header; "sheet" = full-width rows in the mobile menu. */
   variant?: "bar" | "sheet";
+  /** Number of visit updates the visitor hasn't seen — drives the red dot. */
+  unreadCount?: number;
   onNavigate?: () => void;
 }) {
+  const hasUnread = unreadCount > 0;
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -91,6 +104,7 @@ export function AccountMenu({
           className="mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-navy-800 hover:bg-gray-50 dark:text-white/80 dark:hover:bg-white/5"
         >
           <CalendarCheck className="h-4 w-4" /> My Visits
+          {hasUnread && <UnreadDot count={unreadCount} className="ml-auto" />}
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
@@ -106,10 +120,13 @@ export function AccountMenu({
     <div ref={ref} className="relative hidden sm:block">
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Account menu"
-        className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
+        aria-label={hasUnread ? "Account menu — you have an update" : "Account menu"}
+        className="relative flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
       >
         {avatar}
+        {hasUnread && (
+          <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500 dark:border-navy-950" />
+        )}
       </button>
       {open && (
         <div className="absolute right-0 top-12 w-60 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-warm dark:border-white/10 dark:bg-navy-900">
@@ -126,6 +143,7 @@ export function AccountMenu({
             )}
           >
             <CalendarCheck className="h-4 w-4" /> My Visits
+            {hasUnread && <UnreadDot count={unreadCount} className="ml-auto" />}
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}

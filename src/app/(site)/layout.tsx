@@ -7,6 +7,7 @@ import { getSiteSettingsMap } from "@/lib/queries";
 import { parseCustomSocialLinks } from "@/lib/utils";
 import { buildTypographyCss } from "@/lib/typography";
 import { auth } from "@/auth";
+import { countUnseenVisitUpdates } from "@/lib/visitor";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -16,6 +17,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const [settings, session] = await Promise.all([getSiteSettingsMap(), auth()]);
   const logoUrl = settings.site_logo_url || undefined;
   const googleAuthEnabled = Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET);
+  const visitorId = session?.user?.kind === "visitor" ? Number(session.user.visitorId) : NaN;
   const visitor =
     session?.user?.kind === "visitor"
       ? {
@@ -24,6 +26,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           image: session.user.image || "",
         }
       : null;
+  const unreadVisitUpdates =
+    visitor && Number.isInteger(visitorId) ? await countUnseenVisitUpdates(visitorId) : 0;
   const contactAddress = settings.contact_address || "Top City-1, B Block Commercial, Islamabad, Pakistan";
   const contactEmail = settings.contact_email || undefined;
 
@@ -64,7 +68,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <ChatProvider>
       {typographyCss && <style dangerouslySetInnerHTML={{ __html: typographyCss }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />
-      <Navbar logoUrl={logoUrl} visitor={visitor} showAccount={googleAuthEnabled || Boolean(visitor)} />
+      <Navbar
+        logoUrl={logoUrl}
+        visitor={visitor}
+        showAccount={googleAuthEnabled || Boolean(visitor)}
+        unreadVisitUpdates={unreadVisitUpdates}
+      />
       <main className="min-h-screen">{children}</main>
       <Footer
         logoUrl={logoUrl}

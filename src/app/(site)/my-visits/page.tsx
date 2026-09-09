@@ -3,8 +3,9 @@ import Link from "next/link";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { db, schema } from "@/db";
 import { desc, eq } from "drizzle-orm";
-import { getVisitor } from "@/lib/visitor";
+import { getVisitor, markVisitUpdatesSeen } from "@/lib/visitor";
 import { SignInPrompt } from "./sign-in-prompt";
+import { MarkSeen } from "./mark-seen";
 
 export const metadata: Metadata = {
   title: "My Visits",
@@ -44,6 +45,9 @@ export default async function MyVisitsPage() {
     );
   }
 
+  // Opening this page counts as "seen" — clears the unread dot in the header.
+  await markVisitUpdatesSeen(visitor.id);
+
   const visits = await db
     .select({
       id: schema.propertyVisits.id,
@@ -63,6 +67,7 @@ export default async function MyVisitsPage() {
 
   return (
     <div className="pt-28 pb-24">
+      <MarkSeen />
       <div className="section-container max-w-2xl">
         <h1 className="font-serif-brand text-3xl font-medium text-navy-950 dark:text-white">My Visits</h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-white/55">

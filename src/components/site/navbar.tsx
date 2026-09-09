@@ -28,10 +28,12 @@ export function Navbar({
   logoUrl,
   visitor,
   showAccount = true,
+  unreadVisitUpdates = 0,
 }: {
   logoUrl?: string;
   visitor?: AccountVisitor | null;
   showAccount?: boolean;
+  unreadVisitUpdates?: number;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -132,7 +134,9 @@ export function Navbar({
             <span className="h-1.5 w-1.5 rounded-full bg-navy-950" /> Ask Hassan AI
           </Button>
 
-          {showAccount && <AccountMenu visitor={visitor ?? null} variant="bar" />}
+          {showAccount && (
+            <AccountMenu visitor={visitor ?? null} variant="bar" unreadCount={unreadVisitUpdates} />
+          )}
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
@@ -165,7 +169,12 @@ export function Navbar({
               </nav>
               <div className="flex flex-col gap-2 border-t border-gray-100 pt-4 dark:border-white/[0.06]">
                 {showAccount && (
-                  <AccountMenu visitor={visitor ?? null} variant="sheet" onNavigate={() => setMobileOpen(false)} />
+                  <AccountMenu
+                    visitor={visitor ?? null}
+                    variant="sheet"
+                    unreadCount={unreadVisitUpdates}
+                    onNavigate={() => setMobileOpen(false)}
+                  />
                 )}
                 <Button variant="outline" onClick={() => window.open(telLink())}>
                   <Phone className="h-4 w-4" /> Call Us

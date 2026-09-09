@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { UserRound } from "lucide-react";
+import { CalendarCheck, CheckCircle2, Clock3, UserRound, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,20 +14,31 @@ import { Label } from "@/components/ui/label";
 
 const TIME_SLOTS = ["10:00 AM - 12:00 PM", "12:00 PM - 2:00 PM", "2:00 PM - 4:00 PM", "4:00 PM - 6:00 PM", "6:00 PM - 8:00 PM"];
 
+export interface ExistingVisitRequest {
+  status: "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
+  preferredDate: string | null;
+  preferredTime: string;
+  adminNote: string;
+}
+
 export function VisitForm({
   propertyId,
   visitorName,
   bookingEnabled = true,
+  existingRequest = null,
 }: {
   propertyId: number;
   /** Passed when the viewer is signed in with Google; undefined means signed out. */
   visitorName?: string;
   /** False while Google sign-in isn't configured yet. */
   bookingEnabled?: boolean;
+  /** The visitor's most recent request for THIS property, if any. */
+  existingRequest?: ExistingVisitRequest | null;
 }) {
   const pathname = usePathname();
   const [loading, setLoading] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
+  const [rebooking, setRebooking] = React.useState(false);
   const today = new Date().toISOString().split("T")[0];
   const signedIn = visitorName !== undefined;
 
@@ -58,6 +70,7 @@ export function VisitForm({
     }
   }
 
+  // ---- Signed out ----
   if (!signedIn) {
     return (
       <div className="rounded-lg border border-gray-200 bg-gray-50/60 p-5 text-center dark:border-white/[0.06] dark:bg-white/[0.03]">
@@ -83,21 +96,32 @@ export function VisitForm({
     );
   }
 
+  // ---- Just submitted ----
   if (submitted) {
+    return <StatusCard status="NEW" />;
+  }
+
+  // ---- Existing request for this property ----
+  if (existingRequest && !rebooking) {
+    const isFinished = existingRequest.status === "CANCELLED" || existingRequest.status === "COMPLETED";
     return (
-      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-6 text-center dark:border-emerald-500/20 dark:bg-emerald-500/10">
-        <p className="font-semibold text-emerald-800 dark:text-emerald-300">Visit request received!</p>
-        <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-400">
-          It&apos;s pending review. You&apos;ll get an email once our team confirms, and you can track it under{" "}
-          <a href="/my-visits" className="font-semibold underline">
-            My Visits
-          </a>
-          .
-        </p>
+      <div className="space-y-3">
+        <StatusCard
+          status={existingRequest.status}
+          preferredDate={existingRequest.preferredDate}
+          preferredTime={existingRequest.preferredTime}
+          adminNote={existingRequest.adminNote}
+        />
+        {isFinished ? (
+          <Button type="button" variant="outline" className="w-full" onClick={() => setRebooking(true)}>
+            Book another visit
+          </Button>
+        ) : null}
       </div>
     );
   }
 
+  // ---- The booking form ----
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {visitorName ? (
@@ -140,5 +164,76 @@ export function VisitForm({
         {loading ? "Submitting..." : "Book a Property Visit"}
       </Button>
     </form>
+  );
+}
+
+function fmtDate(d: string | null) {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+}
+
+function StatusCard({
+  status,
+  preferredDate = null,
+  preferredTime = "",
+  adminNote = "",
+}: {
+  status: ExistingVisitRequest["status"];
+  preferredDate?: string | null;
+  preferredTime?: string;
+  adminNote?: string;
+}) {
+  const config = {
+    NEW: {
+      cls: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300",
+      icon: <Clock3 className="h-5 w-5" />,
+      title: "Visit request pending review",
+      body: "Our team is reviewing your request. You'll get an email once it's confirmed — no need to book again.",
+    },
+    CONFIRMED: {
+      cls: "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300",
+      icon: <CheckCircle2 className="h-5 w-5" />,
+      title: "Visit confirmed — check your inbox",
+      body: "Your visit to this property is confirmed. We've emailed you the details.",
+    },
+    COMPLETED: {
+      cls: "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300",
+      icon: <CheckCircle2 className="h-5 w-5" />,
+      title: "Visit completed",
+      body: "You've already visited this property with us. Book another time if you'd like to come again.",
+    },
+    CANCELLED: {
+      cls: "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300",
+      icon: <XCircle className="h-5 w-5" />,
+      title: "Previous request cancelled",
+      body: "Your last request for this property couldn't go ahead. You're welcome to book a new time.",
+    },
+  }[status];
+
+  return (
+    <div className={`rounded-lg border p-5 ${config.cls}`}>
+      <div className="flex items-center gap-2">
+        {config.icon}
+        <p className="font-semibold">{config.title}</p>
+      </div>
+      <p className="mt-1.5 text-sm opacity-90">{config.body}</p>
+      {(preferredDate || preferredTime) && (status === "NEW" || status === "CONFIRMED") ? (
+        <p className="mt-2 text-sm font-medium">
+          {fmtDate(preferredDate)}
+          {preferredTime ? ` · ${preferredTime}` : ""}
+        </p>
+      ) : null}
+      {adminNote ? (
+        <p className="mt-2 rounded-md bg-white/50 p-2 text-sm dark:bg-black/20">
+          <span className="font-semibold">From our team:</span> {adminNote}
+        </p>
+      ) : null}
+      <Link
+        href="/my-visits"
+        className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold underline underline-offset-2"
+      >
+        <CalendarCheck className="h-3.5 w-3.5" /> View in My Visits
+      </Link>
+    </div>
   );
 }

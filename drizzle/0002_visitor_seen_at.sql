@@ -1,0 +1,1 @@
+ALTER TABLE "property_visits" ADD COLUMN "visitor_seen_at" timestamp;

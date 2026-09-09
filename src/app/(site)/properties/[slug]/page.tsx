@@ -12,6 +12,8 @@ import { PropertyCard } from "@/components/site/property-card";
 import { Reveal } from "@/components/site/reveal";
 import { getPropertyBySlug, getRelatedProperties } from "@/lib/queries";
 import { auth } from "@/auth";
+import { getVisitorRequestForProperty } from "@/lib/visitor";
+import type { ExistingVisitRequest } from "@/components/site/visit-form";
 import {
   AREA_UNIT_LABELS,
   formatPKR,
@@ -45,7 +47,22 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
   const related = await getRelatedProperties(property);
   const session = await auth();
+  const visitorId = session?.user?.kind === "visitor" ? Number(session.user.visitorId) : NaN;
   const visitorName = session?.user?.kind === "visitor" ? session.user.name || "" : undefined;
+
+  let existingRequest: ExistingVisitRequest | null = null;
+  if (Number.isInteger(visitorId)) {
+    const req = await getVisitorRequestForProperty(visitorId, property.id);
+    if (req) {
+      existingRequest = {
+        status: req.status,
+        preferredDate: req.preferredDate ? new Date(req.preferredDate).toISOString() : null,
+        preferredTime: req.preferredTime,
+        adminNote: req.adminNote,
+      };
+    }
+  }
+
   const images = property.images.map((i) => i.url).filter(Boolean);
   if (images.length === 0 && property.featuredImage) images.push(property.featuredImage);
 
@@ -188,6 +205,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 propertyId={property.id}
                 visitorName={visitorName}
                 bookingEnabled={Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET)}
+                existingRequest={existingRequest}
               />
             </div>
           </div>
