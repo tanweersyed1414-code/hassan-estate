@@ -315,6 +315,28 @@ export const mediaFiles = pgTable("media_files", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// ---------- PAGE VIEWS (first-party, cookieless analytics) ----------
+export const pageViews = pgTable(
+  "page_views",
+  {
+    id: serial("id").primaryKey(),
+    path: varchar("path", { length: 512 }).notNull(),
+    // Hostname of the external referrer only ("" for direct or internal navigation).
+    referrerHost: varchar("referrer_host", { length: 191 }).notNull().default(""),
+    // Daily-rotating hash of IP + user-agent — lets us count unique visitors per
+    // day without a cookie and without storing any identifying data.
+    visitorHash: varchar("visitor_hash", { length: 64 }).notNull().default(""),
+    propertyId: integer("property_id").references(() => properties.id, { onDelete: "set null" }),
+    projectId: integer("project_id").references(() => constructionProjects.id, { onDelete: "set null" }),
+    isBot: boolean("is_bot").notNull().default(false),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    createdIdx: index("page_views_created_idx").on(t.createdAt),
+    pathIdx: index("page_views_path_idx").on(t.path),
+  })
+);
+
 // ---------- RELATIONS ----------
 export const propertiesRelations = relations(properties, ({ many }) => ({
   images: many(propertyImages),
@@ -369,3 +391,4 @@ export type Visitor = typeof visitors.$inferSelect;
 export type AIKnowledgeEntry = typeof aiKnowledgeBase.$inferSelect;
 export type SiteSetting = typeof siteSettings.$inferSelect;
 export type MediaFile = typeof mediaFiles.$inferSelect;
+export type PageView = typeof pageViews.$inferSelect;

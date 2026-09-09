@@ -8,6 +8,7 @@ import { parseCustomSocialLinks } from "@/lib/utils";
 import { buildTypographyCss } from "@/lib/typography";
 import { auth } from "@/auth";
 import { countUnseenVisitUpdates } from "@/lib/visitor";
+import { PageViewTracker } from "@/components/site/page-view-tracker";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -85,6 +86,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       />
       <FloatingButtons />
       <ChatWidget />
+      <PageViewTracker />
     </ChatProvider>
   );
 }

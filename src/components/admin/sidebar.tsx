@@ -8,6 +8,7 @@ import { signOut } from "next-auth/react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   LayoutDashboard,
+  BarChart3,
   Building2,
   HardHat,
   Wallet,
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/statistics", label: "Statistics", icon: BarChart3 },
   { href: "/admin/properties", label: "Properties", icon: Building2 },
   { href: "/admin/projects", label: "Construction Projects", icon: HardHat },
   { href: "/admin/payment-plans", label: "Payment Plans", icon: Wallet },

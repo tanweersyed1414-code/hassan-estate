@@ -51,6 +51,12 @@ export default async function PrivacyPage() {
                 that keeps you logged in after you sign in with Google. The site does not use advertising or analytics
                 tracking cookies.
               </li>
+              <li>
+                <strong className="text-navy-900 dark:text-white/85">Aggregate page-view counts</strong> — we record which
+                pages are viewed so we can see what content is popular. This uses no cookies. To count unique daily
+                visitors, we store a one-way code derived from your IP address and browser for that day only; it cannot
+                be traced back to you and is not linked across days.
+              </li>
             </ul>
           </Section>
 
